@@ -6,23 +6,27 @@ const content = process.argv[4];
 
 switch (command) {
     case 'list':
-        list((error,notes) => {
+        list((error, notes) => {
             if (error) return console.error(error.message);
 
-            notes.forEach((note, index) => console.log(`${index + 1}.${note.title}`));
+            notes.forEach((note, index) => console.log(`${index + 1}. ${note.title}`));
         });
         break;
-    
+
     case 'view':
-        view(title, (error, notes) => {
+        view(title, (error, note) => {
             if (error) return console.error(error.message);
 
-            console.log(`# ${notes.title}\n\n---\n\n${notes.content}`);
+            console.log(`# ${note.title}\n\n---\n\n${note.content}`);
         });
         break;
 
-    case 'creat':
-        creat();
+    case 'create':
+        create(title, content, error => {
+            if (error) console.log(error.message);
+
+            console.log('Заметка создана');
+        });
         break;
 
     case 'remove':
@@ -30,7 +34,7 @@ switch (command) {
         break;
 
     default:
-        console.log('Неизвестная команда');
+        console.log("Неизвестная команда!");
 }
 
 
@@ -39,7 +43,7 @@ function list(done) {
         if (error) return done(error);
 
         const notes = JSON.parse(data);
-        done(null, notes);            
+        done(null, notes);
     });
 }
 
@@ -53,5 +57,20 @@ function view(title, done) {
         if (!note) return done(new Error('Заметка не найдена'));
 
         done(null, notes);
+    });
+}
+
+function create(title, content, done) {
+    fs.readFile('notes.json', (error, data) => {
+        if (error) return done(error);
+
+        const notes = JSON.parse(data);
+        notes.push({title, content});
+        const json = JSON.stringify(notes);
+        fs.writeFile('notes.json', json, error => {
+            if (error) return done(error);
+
+            done();
+        });
     });
 }
