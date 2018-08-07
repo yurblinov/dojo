@@ -12,7 +12,7 @@ Finished reading*/
 
 /*Async*/
 
-console.log('Reading directory');
+console.log('Readinf directory');
 fs.readdir(__dirname, (error, contentents) => {
     if (error) throw error;
 
